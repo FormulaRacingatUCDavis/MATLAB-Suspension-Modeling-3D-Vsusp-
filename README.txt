@@ -6,6 +6,6 @@ Welcome to the GitHub repository for MATLAB Suspension Modeling for FRUCD! Add t
 
 	Analysis programs define test routines. They direct an object file to use its internal functions in response to a range of input. Often they 	sweep through the range, calculate a desired parameter, and display the relationship between the two.
 
-	Results from analysis programs and useful data from actual track sessions will be stored in the data folder. Any data calculated internally will 	come from analysis programs. The data may given as numbers, or instances of object files that correspond to a specific input.
+	Results from analysis programs and useful data from actual track sessions will be stored in the Data folder. This folder does not exist yet because 	it is empty.
 
 For further questions, please contact FRUCD suspension subteam co-lead Jonah Grancell (jsgrancell@ucdavis.edu)
