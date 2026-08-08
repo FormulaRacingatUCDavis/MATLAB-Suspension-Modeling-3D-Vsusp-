@@ -45,8 +45,6 @@ classdef Spring
             s2 = obj.s2;
 
             if obj.hasHelper % Including Helper Spring
-                % Parallel Constant
-            
                 % Series Constant (Preload)
                 ks = (k1 * k2) / (k1 + k2);
             
