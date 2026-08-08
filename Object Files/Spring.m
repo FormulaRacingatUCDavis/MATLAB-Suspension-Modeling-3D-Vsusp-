@@ -45,9 +45,6 @@ classdef Spring
             s2 = obj.s2;
 
             if obj.hasHelper % Including Helper Spring
-                % Parallel Constant
-                kp = k1 + k2;
-            
                 % Series Constant (Preload)
                 ks = (k1 * k2) / (k1 + k2);
             
@@ -74,7 +71,6 @@ classdef Spring
                 end
             else % Not Including Helper Spring (Single Spring)
                 l2 = 0;
-                kp = k1;
                 fp = p * k1;
                 x1_unbound = (fp + f) / k1;
                 x1 = min(x1_unbound, s1);
@@ -89,14 +85,12 @@ classdef Spring
             ltotal = (l1 + l2) - xtotal;
         
             % Packing Results
-            results.kp = kp;
             results.kc = kc;
             results.x1 = x1;
             results.x2 = x2;
             results.ltotal = ltotal;
         
             % Print Results
-            fprintf('Parallel Spring Constant, kp = %.4f N/mm\n', kp);
             fprintf('Current Spring Constant, kc = %.4f N/mm\n', kc);
             fprintf('Primary Spring Compression, x1 = %.4f mm (max s1 = %.4f mm)\n', x1, s1);
             if obj.hasHelper
