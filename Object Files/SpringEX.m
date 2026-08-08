@@ -20,7 +20,7 @@ classdef SpringEX
     end
 
     methods
-        function obj = Spring(p,k1,l1,s1,k2,l2,s2)
+        function obj = SpringEX(p,k1,l1,s1,k2,l2,s2)
             % Constructor
             obj.p = p;
             obj.k1 = k1;
@@ -37,16 +37,16 @@ classdef SpringEX
                 if obj.k2 == 0                                             
                     obj.k = obj.k1;
                 else
-                    obj.k = (obj.k1 * obj.k2) / (obj.k1 + obj.k2);
+                    obj.k = (obj.k1*obj.k2)/(obj.k1+obj.k2);
                 end
                 % Preload Force 
-                Fp = obj.p * obj.k;
+                Fp = -obj.p*obj.k
                 
-                obj.x = displace(Fp+F,obj.k1,obj.s1) - Fp*obj.k1;                   % I should have specified, the change in length we're looking for excludes preload, hence the pre
+                obj.x = obj.displace(Fp+F,obj.k1,obj.s1) + Fp/obj.k1;                   % I should have specified, the change in length we're looking for excludes preload, hence the pre
                                                                                     % The point of preload here is purposely compressing the spring before any damper motion happens
-                if obj.k2 == 0                                                      % to ensure the helper is fully compressed at static, and the compression we are measuring is
-                    obj.x = obj.x + displace(Fp+F,obj.k2,obj.s2) - Fp*obj.k2;       % effectively shock travel.
-                    if displace(Fp+F,obj.k2,obj.s2) == obj.s2
+                if obj.k2 ~= 0                                                      % to ensure the helper is fully compressed at static, and the compression we are measuring is
+                    obj.x = obj.x + obj.displace(Fp+F,obj.k2,obj.s2) + Fp/obj.k2;       % effectively shock travel.
+                    if obj.displace(Fp+F,obj.k2,obj.s2) == obj.s2
                         obj.k = obj.k1;
                     end
                 end     
