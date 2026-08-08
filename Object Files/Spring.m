@@ -44,8 +44,6 @@ classdef Spring
             l2 = obj.l2;
             s2 = obj.s2;
 
-
-
             if obj.hasHelper % Including Helper Spring
                 % Parallel Constant
                 kp = k1 + k2;
