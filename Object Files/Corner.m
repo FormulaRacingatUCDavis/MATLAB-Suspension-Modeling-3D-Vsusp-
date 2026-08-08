@@ -190,8 +190,8 @@ classdef Corner                                                            % Cla
             end
         end
 
-        function obj = solveForce(obj,F)                                   % Static 2-force member solver based on Evan Flickinger's 2014 CSUN master's thesis
-            if isequal(F,[0,0,0])                                          % "Design and analysis of formula SAE car suspension members"
+        function obj = solveForce(obj,Fx,Fy,Fz)                            % Static 2-force member solver based on Evan Flickinger's 2014 CSUN master's thesis
+            if isequal([Fx,Fy,Fz],[0,0,0])                                 % "Design and analysis of formula SAE car suspension members"
                 obj.forces(1:10) = 0;                                      % Unloaded case must eventually account for unsprung mass
                 return
             end
@@ -205,7 +205,7 @@ classdef Corner                                                            % Cla
                 A(5,i) = A(3,i)*r(i,1)-A(1,i)*r(i,3);
                 A(6,i) = A(2,i)*r(i,1)-A(1,i)*r(i,2);
             end
-            B(1:3) = F;                                                    
+            B(1:3) = [Fx,Fy,Fz];                                                    
             B(4:6) = cross(B(1:3),R);                                      % Moments about wheel-upright interface by wheel loads
             obj.forces(1:6) = (A\B');                                      % Finds forces through the first 6 links
 
@@ -222,7 +222,7 @@ classdef Corner                                                            % Cla
             % obj.forces(7) = -norm(fp)*sin1*norm(obj.rocker(1,:))/(sin2*norm(obj.rocker(2,:)));
             
             obj.forces(7) = -mp/(norm(obj.rocker(2,:))*sin2);              % Force through shock
-            obj.forces(8:10) = F;
+            obj.forces(8:10) = [Fx,Fy,Fz];
         end
 
         function obj = solveBump(obj, bump)
