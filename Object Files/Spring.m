@@ -1,19 +1,52 @@
 classdef Spring
+    properties
+        % Required:
+        k1 % Primary Spring Rate
+        l1 % Primary Static / Free Length
+        s1 % Primary Stroke / Available Compression
+        p % Total Preload Displacement
+        f % Force Through Springs
+
+        % Optional:
+        k2 = [] % Secondary Spring Rate
+        l2 = [] % Secondary Static / Free Length
+        s2 = [] % Secondary Stroke / Available Compression
+
+        hasHelper % 8 Args = True - 5 Args = False
+    end
+
     methods
-        function results = seriesSpring(k1,l1,s1,p,f,k2,l2,s2)
-            % REQUIRED:
-            % k1 - Primary Spring Rate
-            % l1 - Primary Static / Free Length
-            % s1 - Primary Stroke / Available Compression
-            % p - Total Preload Displacement
-            % f - Force Through Springs
+        function obj = Spring(k1,l1,s1,p,f,k2,l2,s2)
+            % Constructor
+            obj.k1 = k1;
+            obj.l1 = l1;
+            obj.s1 = s1;
+            obj.p = p;
+            obj.f = f;
 
-            % OPTIONAL:
-            % k2 - Secondary Spring Rate
-            % l2 - Secondary Static / Free Length
-            % s2 - Secondary Stroke / Available Compression
+            obj.hasHelper = (nargin == 8);
 
-            if nargin == 8 % Including Helper Spring
+            if obj.hasHelper
+                obj.k2 = k2;
+                obj.l2 = l2;
+                obj.s2 = s2;
+            end
+        end
+
+        function results = seriesSpring(obj)
+            % Pull Values From Object
+            k1 = obj.k1;
+            l1 = obj.l1;
+            s1 = obj.s1;
+            p = obj.p;
+            f = obj.f;
+            k2 = obj.k2;
+            l2 = obj.l2;
+            s2 = obj.s2;
+
+
+
+            if obj.hasHelper % Including Helper Spring
                 % Parallel Constant
                 kp = k1 + k2;
             
@@ -68,7 +101,7 @@ classdef Spring
             fprintf('Parallel Spring Constant, kp = %.4f N/mm\n', kp);
             fprintf('Current Spring Constant, kc = %.4f N/mm\n', kc);
             fprintf('Primary Spring Compression, x1 = %.4f mm (max s1 = %.4f mm)\n', x1, s1);
-            if nargin == 8
+            if obj.hasHelper
                 fprintf('Secondary Spring Compression, x2 = %.4f mm (max s2 = %.4f mm)\n', x2, s2);
             else
                 fprintf('Secondary Spring: none (single-spring mode)\n');
