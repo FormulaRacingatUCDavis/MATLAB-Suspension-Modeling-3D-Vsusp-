@@ -40,7 +40,7 @@ classdef SpringEX
                     obj.k = (obj.k1*obj.k2)/(obj.k1+obj.k2);
                 end
                 % Preload Force 
-                Fp = -obj.p*obj.k
+                Fp = -obj.p*obj.k;
                 
                 obj.x = obj.displace(Fp+F,obj.k1,obj.s1) + Fp/obj.k1;                   % I should have specified, the change in length we're looking for excludes preload, hence the pre
                                                                                     % The point of preload here is purposely compressing the spring before any damper motion happens
