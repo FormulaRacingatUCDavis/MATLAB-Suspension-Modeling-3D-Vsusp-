@@ -1,10 +1,5 @@
 classdef SpringEX
     properties
-        % I assigned initial values of zero. If no input is given, this
-        % doesn't change and whether the spring is single or series is
-        % determined by the k2 value being zero
-
-        % Required:
         k = 0 % Total spring constant
         x = 0 % Total spring compression
 
@@ -21,7 +16,6 @@ classdef SpringEX
 
     methods
         function obj = SpringEX(p,k1,l1,s1,k2,l2,s2)
-            % Constructor
             obj.p = p;
             obj.k1 = k1;
             obj.l1 = l1;
@@ -39,7 +33,6 @@ classdef SpringEX
                 else
                     obj.k = (obj.k1*obj.k2)/(obj.k1+obj.k2);
                 end
-                % Preload Force 
                 Fp = -obj.p*obj.k;
                 
                 obj.x = obj.displace(Fp+F,obj.k1,obj.s1) + Fp/obj.k1;                   % I should have specified, the change in length we're looking for excludes preload, hence the pre

@@ -269,6 +269,15 @@ classdef Corner                                                            % Cla
             obj = obj.evaluate();
         end
 
+        function obj = solveSteer(obj,steer)
+            obj.inboard(5,2) = obj.inboard(5,2)+steer;
+            obj.outboard(5,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.inboard(5,:), norm(obj.upright(2,:)), norm(obj.upright(3,:)), norm(obj.links(5,:)), obj.outboard(5,:));     % Finds tie rod outboard point
+            obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
+            obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(3,:));
+            obj.outboard
+            obj = obj.evaluate();
+        end
+
         function cornerPlot(obj)
             hold on
             plot3([obj.outboard(1,1), obj.inboard(1,1)], [obj.outboard(1,2), obj.inboard(1,2)], [obj.outboard(1,3), obj.inboard(1,3)], '-o', 'Color', 'b', 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k', 'LineWidth', 4)

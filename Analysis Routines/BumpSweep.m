@@ -14,7 +14,7 @@ function [bump, Frames] = BumpSweep(carParams, ForR)
             error('Please enter F or R for front or rear')
     end
     
-    % Our linspace will be lock to look on the steering rack given in
+    % Our linspace for steerSweep will be lock to look on the steering rack given in
     % travel from neutral
 
     bump = linspace(norm(Frames(1).shock)-200,norm(Frames(1).shock)-150,n);
