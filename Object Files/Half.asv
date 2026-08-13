@@ -1,0 +1,92 @@
+classdef Half
+    properties
+        L = Corner()
+        R = Corner()
+        Spring = Spring()
+        krc = 0
+    end
+    methods
+        function obj = Half(outboard,inboard,wheel,spring,preload)
+            obj.L = Corner(outboard,inboard,wheel,spring,preload);
+            obj.R = Corner(outboard.*[1,-1,1], inboard.*[1,-1,1], wheel.*[1,-1,1],spring,preload);
+            % obj.L = obj.L.findTire(8*25.4,5*25.4);
+            % obj.R = obj.R.findTire(8*25.4,5*25.4);
+            % obj = obj.findKRC();
+        end
+        function obj = evaluate(obj)
+            obj = obj.findKRC;
+            obj.L = obj.L.evaluate();
+            obj.R = obj.R.evaluate();
+        end
+        function obj = findKRC(obj)
+            A = zeros(2,4,2);
+
+            v1 = obj.R.wheel(2,:) - obj.L.wheel(2,:);
+            v2 = obj.L.wheel(2,:).*[0,0,-1];
+
+            A(1,1:3,1) = cross(v1,v2)/norm(cross(v1,v2));
+            A(1,1:3,2) = A(1,1:3,1);
+            A(1,4,1) = dot(A(1,1:3,1),obj.L.wheel(2,:));
+            A(1,4,2) = dot(A(1,1:3,2),obj.R.wheel(2,:));
+            
+            obj.L = obj.L.findIC(A);
+            
+            obj.R = obj.R.findIC(A);
+
+            v1 = obj.L.ic-obj.L.contactPt;
+            v2 = obj.R.ic-obj.R.contactPt;
+            
+            A = zeros(3,3);
+            A(:,1) = (v1)';
+            A(:,2) = -(v2)';
+            A(:,3) = (obj.R.ic-obj.L.ic)';
+            
+            A = rref(A);
+            obj.krc = [obj.L.ic(1)+A(1,3)*v1(1), obj.L.ic(2)+A(1,3)*v1(2), obj.L.ic(3)+A(1,3)*v1(3)];
+        end
+        function halfPlot(obj)
+            obj.L.cornerPlot()
+            obj.R.cornerPlot()
+
+            plot3([obj.L.inboard(9,1), obj.R.inboard(9,1)], [obj.L.inboard(9,2), obj.R.inboard(9,2)], [obj.L.inboard(9,3), obj.R.inboard(9,3)], 'Color', 'k', 'LineWidth', 4)
+
+            plot3([obj.L.inboard(1,1), obj.R.inboard(1,1)], [obj.L.inboard(1,2), obj.R.inboard(1,2)], [obj.L.inboard(1,3), obj.R.inboard(1,3)], 'Color', 'k', 'LineWidth', 4)
+            plot3([obj.L.inboard(2,1), obj.R.inboard(2,1)], [obj.L.inboard(2,2), obj.R.inboard(2,2)], [obj.L.inboard(2,3), obj.R.inboard(2,3)], 'Color', 'k', 'LineWidth', 4)
+            plot3([obj.L.inboard(3,1), obj.R.inboard(3,1)], [obj.L.inboard(3,2), obj.R.inboard(3,2)], [obj.L.inboard(3,3), obj.R.inboard(3,3)], 'Color', 'k', 'LineWidth', 4)
+            plot3([obj.L.inboard(4,1), obj.R.inboard(4,1)], [obj.L.inboard(4,2), obj.R.inboard(4,2)], [obj.L.inboard(4,3), obj.R.inboard(4,3)], 'Color', 'k', 'LineWidth', 4)
+            ylim([-1000,1000]);
+
+        end
+        function krcPlot(obj)
+            obj.halfPlot()
+            plot3(obj.krc(1), obj.krc(2), obj.krc(3), '-o', 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g', 'MarkerSize', 10)
+        end
+        function obj = rollHalf(obj,a2,roll,order)
+            obj.L = obj.L.rollCorner(obj.krc,a2,roll,order);
+            obj.R = obj.R.rollCorner(obj.krc,a2,roll,order);
+        end
+        function obj = pitchHalf(obj,a1,a2,pitch,order)
+            obj.L = obj.L.rollCorner(a1,a2,pitch,order);
+            obj.R = obj.R.rollCorner(a2,a1,-pitch,order);
+        end
+        function obj = ground(obj, p)
+            obj.L = obj.L.ground(p);
+            obj.R = obj.R.ground(p);
+            obj = obj.findKRC();
+            obj.L = obj.L.findTire(8*25.4,5*25.4);
+            obj.R = obj.R.findTire(8*25.4,5*25.4);
+        end
+        function obj = solveLLT(obj, Fz0, dFz, a)
+            obj.L = obj.L.solveForce(0,(Fz0-dFz)*a,(Fz0-dFz));
+            obj.L = obj.L.solveBump();
+            obj.R = obj.R.solveForce(0,(Fz0+dFz)*a,(Fz0+dFz));
+            obj.R = obj.R.solveBump();
+        end
+        function obj = solveStatic(obj,Fz)
+            obj.L = obj.L.solveForce([0,0,Fz]);
+            obj.L = obj.L.solveBump();
+            obj.R = obj.R.solveForce([0,0,Fz]);
+            obj.R = obj.R.solveBump();
+        end
+    end
+end

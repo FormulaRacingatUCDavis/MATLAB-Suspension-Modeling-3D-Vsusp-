@@ -19,16 +19,19 @@ classdef Corner                                                            % Cla
         forces = zeros(1,10)                                               % Stores forces through each link (1:6), the force through the shock (7), and the X, Y, and Z wheel loads (8:10)                     
 
         ic = zeros(1,3)                                                    % Stores the location of the instant center of the corner
-
-        k = 0                                                              % Stores the spring rate of the corner
+        
+        Spring = Spring()                                                  % Stores the spring of the corner
     end
 
     methods                                                                % Methods are functions included in the class
-        function obj = Corner(outboard,inboard,wheel,k)                    % Initializes an instance of the class from these inputs
+        function obj = Corner(outboard,inboard,wheel,spring,p)               % Initializes an instance of the class from these inputs
+            if nargin == 0
+                return
+            end
             obj.wheel = wheel;                                             
             obj.outboard = outboard;
             obj.inboard(1:size(inboard,1),:) = inboard;                    % In case an incomplete set of coordinates (missing prs assembly) is inputted
-            obj.k = (k*0.175127);                                          % Convert from lb/in to N/mm
+            obj.Spring = Spring(spring,p);                                        % Convert from lb/in to N/mm
             obj = obj.evaluate();
         end
 
@@ -191,6 +194,9 @@ classdef Corner                                                            % Cla
         end
 
         function obj = solveForce(obj,Fx,Fy,Fz)                            % Static 2-force member solver based on Evan Flickinger's 2014 CSUN master's thesis
+            Fx
+            Fy
+            Fz
             if isequal([Fx,Fy,Fz],[0,0,0])                                 % "Design and analysis of formula SAE car suspension members"
                 obj.forces(1:10) = 0;                                      % Unloaded case must eventually account for unsprung mass
                 return
@@ -226,16 +232,17 @@ classdef Corner                                                            % Cla
         end
 
         function obj = solveBump(obj, bump)
-            if obj.apex(:,4) == 1
-                i = 1;
-                j = 3;
-            else
-                i = 3;
-                j = 1;
-            end
             if ~isequal(obj.inboard(7:9,:),zeros(3))
+                if obj.apex(:,4) == 1
+                    i = 1;
+                    j = 3;
+                else
+                    i = 3;
+                    j = 1;
+                end
                 if nargin == 1
-                    l = 200 + obj.forces(7)/obj.k;
+                    obj.Spring = obj.Spring.solve(obj.forces(7));
+                    l = 200 - obj.Spring.x;
                 else
                     l = norm(obj.shock(:))-bump;
                 end

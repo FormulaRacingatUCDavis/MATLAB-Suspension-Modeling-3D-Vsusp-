@@ -35,7 +35,7 @@ classdef Corner                                                            % Cla
             obj = obj.evaluate();
 
             if nargin == 7
-                obj.Spring = SpringEX(p,k1,l1,s1)
+                obj.Spring = SpringEX(p,k1,l1,s1);
             else
                 obj.Spring = SpringEX();
             end
