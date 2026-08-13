@@ -4,6 +4,7 @@ classdef Half
         R = Corner()
         Spring = Spring()
         krc = 0
+        roll = 0
     end
     methods
         function obj = Half(outboard,inboard,wheel,spring,preload)
@@ -72,27 +73,39 @@ classdef Half
         function obj = ground(obj, p)
             obj.L = obj.L.ground(p);
             obj.R = obj.R.ground(p);
+            obj = obj.evaluate();
         end
         function obj = solveLLT(obj, Fz0, dFz, a)
-            obj.L = obj.L.solveForce(0,(Fz0-dFz)*a,(Fz0-dFz));
+            obj.L = obj.L.solveForce(0,(Fz0/2-dFz)*a,(Fz0/2-dFz));
             obj.L = obj.L.solveBump();
-            obj.R = obj.R.solveForce(0,(Fz0+dFz)*a,(Fz0+dFz));
+            obj.R = obj.R.solveForce(0,(Fz0/2+dFz)*a,(Fz0/2+dFz));
             obj.R = obj.R.solveBump();
             obj = obj.evaluate();
         end
         function obj = solveStatic(obj,Fz)
-            obj.L = obj.L.solveForce(0,0,Fz);
+            obj.L = obj.L.solveForce(0,0,Fz/2);
             obj.L = obj.L.solveBump();
-            obj.R = obj.R.solveForce(0,0,Fz);
+            obj.R = obj.R.solveForce(0,0,Fz/2);
             obj.R = obj.R.solveBump();
-            obj = obj.evaluate();
+            obj = obj.ground(obj.L.contactPt);
         end
         function obj = level(obj)
             while norm(obj.L.contactPt(3) - obj.R.contactPt(3)) > 2^-32
-                theta = atand((obj.L.contactPt(3) - obj.R.contactPt(3))/...
+                theta = -atand((obj.L.contactPt(3) - obj.R.contactPt(3))/...
                     norm(obj.L.contactPt(1:2) - obj.R.contactPt(1:2)));
-                obj = obj.rollHalf(obj.krc.*[0,1,1],-theta,"ZYX");
+                obj = obj.rollHalf(obj.krc.*[0,1,1],theta,"ZYX");
+                obj.roll = obj.roll+theta;
             end
+            obj = obj.ground(obj.L.contactPt);
+        end
+        function obj = solveSteer(obj,steer)
+            obj.L = obj.L.solveSteer(steer);
+            obj.R = obj.R.solveSteer(steer);
+        end
+        function obj = align(obj,staticToe,staticCamber)
+            obj.L = obj.L.align(staticToe,staticCamber);
+            obj.R = obj.R.align(staticToe,staticCamber);
+            obj = obj.ground(obj.L.contactPt);
         end
     end
 end
