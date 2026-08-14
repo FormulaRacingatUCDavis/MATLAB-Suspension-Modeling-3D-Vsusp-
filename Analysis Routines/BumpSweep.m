@@ -1,5 +1,5 @@
 
-function [bump, Frames] = BumpSweep(carParams, ForR)
+function [Frames,bump] = BumpSweep(carParams, ForR)
     clf
     n = 51;                                                                
     

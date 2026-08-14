@@ -9,16 +9,16 @@ function [Frames,bump,shock,idx] = ForceSweep(carParams, ForR)
         otherwise
             error('Please enter F or R for front or rear')
     end
-    m = 310;
+    m = 210;
     pFront = 0.54;
     n = 51;
     FzStatic = 0.5*pFront*m*9.8;
-    Fz = linspace(0,FzStatic*2,n-1)
+    Fz = linspace(0,FzStatic*2,n-1);
     for i = 1:3
         Frames = Frames.solveForce(0,0,FzStatic);
         Frames = Frames.solveBump();
     end
-    Frames = Frames.ground(Frames.contactPt);
+    Frames = Frames.align(0,-1.2);
     Frames(2:n) = Frames;
     idx = find(abs(Fz-FzStatic) == min(abs(Fz-FzStatic)));
     Fz(idx(2)+1:end+1) = Fz(idx(2):end);
@@ -33,7 +33,7 @@ function [Frames,bump,shock,idx] = ForceSweep(carParams, ForR)
         bump(i) = Frames(i).wheel(2,3)-Frames(idx(2)).wheel(2,3);
         travel(i) = norm(Frames(i).shock(:))-norm(Frames(idx(2)).shock(:));
     end
-
+    
     for i = idx(2)+1:n
         for j = 1:3
             Frames(i) = Frames(i-1).solveForce(0,0,Fz(i));

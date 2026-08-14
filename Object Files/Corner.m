@@ -10,7 +10,7 @@ classdef Corner                                                            % Cla
         tire = zeros(51,3,4)                                               % Points that create tire surfaces on the graph
                                                                            
         links = zeros(6,3)                                                 % Each of the 6 suspension links represented in vector notation
-        upright = zeros(9,3)                                               % Locations of outboard points and wheel points relative to each other
+        upright = zeros(12,3)                                              % Locations of outboard points and wheel points relative to each other
         apex = zeros(3,4)                                                  % Location of our apex relative to the control arm it's on, the extra length (:,4) stores a 0 or 1 to signal a lower or upper control arm apex
         rocker = zeros(3,3)                                                % Stores the relationship of the rocker (outboard(6:8,:)) relative to each other
         shock = zeros(1,3)                                                 % Stores the vector outboard(8,:) - outboard(9,:) which represents the shock. The length of this vector is the overall shock length
@@ -34,7 +34,10 @@ classdef Corner                                                            % Cla
             obj.Spring = Spring(spring,p);                                        % Convert from lb/in to N/mm
             obj = obj.evaluate();
         end
-
+        
+        function obj = findLinks(obj)
+            
+        end
         function obj = evaluate(obj)                                       % Finds the rest of parameters not explicitly given by input
             for i = 1:6                                                    % For each arm
                 obj.links(i,:) = obj.outboard(i,:)-obj.inboard(i,:);       % Finds the vector components of each link
@@ -47,9 +50,14 @@ classdef Corner                                                            % Cla
             obj.upright(4,:) = obj.wheel(1,:)-obj.outboard(1,:);
             obj.upright(5,:) = obj.wheel(1,:)-obj.outboard(3,:);
             obj.upright(6,:) = obj.wheel(1,:)-obj.outboard(5,:);
-            obj.upright(7,:) = obj.wheel(3,:)-obj.outboard(1,:);
-            obj.upright(8,:) = obj.wheel(3,:)-obj.outboard(3,:);
-            obj.upright(9,:) = obj.wheel(3,:)-obj.outboard(5,:);
+
+            obj.upright(7,:) = obj.wheel(2,:)-obj.outboard(1,:);
+            obj.upright(8,:) = obj.wheel(2,:)-obj.outboard(3,:);
+            obj.upright(9,:) = obj.wheel(2,:)-obj.outboard(5,:);
+
+            obj.upright(10,:) = obj.wheel(3,:)-obj.outboard(1,:);
+            obj.upright(11,:) = obj.wheel(3,:)-obj.outboard(3,:);
+            obj.upright(12,:) = obj.wheel(3,:)-obj.outboard(5,:);
 
             obj.rocker(1,:) = obj.inboard(6,:)-obj.inboard(7,:);       
             obj.rocker(2,:) = obj.inboard(8,:)-obj.inboard(7,:);       
@@ -248,7 +256,7 @@ classdef Corner                                                            % Cla
                 end
                 obj.inboard(8,:) = obj.solvePlane(obj.inboard(9,:), obj.inboard(7,:), l, norm(obj.rocker(2,:)), obj.inboard(8,:));
                 obj.inboard(6,:) = obj.solvePlane(obj.inboard(7,:), obj.inboard(8,:), norm(obj.rocker(1,:)), norm(obj.rocker(3,:)), obj.inboard(6,:));  
-                obj.outboard(6,:) = obj.solveSpheres(obj.inboard(i,:), obj.inboard(i+1,:), obj.inboard(6,:), norm(obj.apex(1,:)), norm(obj.apex(2,:)), norm(obj.links(6,:)), obj.outboard(6,:));
+                obj.outboard(6,:) = obj.solveSpheres(obj.inboard(i,:), obj.inboard(i+1,:), obj.inboard(6,:), norm(obj.apex(1,1:3)), norm(obj.apex(2,1:3)), norm(obj.links(6,:)), obj.outboard(6,:));
                 obj.outboard(i,:) = obj.solveSpheres(obj.inboard(i,:), obj.inboard(i+1,:), obj.outboard(6,:), norm(obj.links(i,:)), norm(obj.links(i+1,:)), norm(obj.apex(3,1:3)), obj.outboard(i,:));
                 obj.outboard(i+1,:) = obj.outboard(i,:);
                 obj.outboard(j,:) = obj.solveSpheres(obj.inboard(j,:), obj.inboard(j+1,:), obj.outboard(i,:), norm(obj.links(j,:)), norm(obj.links(j+1,:)), norm(obj.upright(1,:)), obj.outboard(j,:));
@@ -267,7 +275,8 @@ classdef Corner                                                            % Cla
             end
             obj.outboard(5,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.inboard(5,:), norm(obj.upright(2,:)), norm(obj.upright(3,:)), norm(obj.links(5,:)), obj.outboard(5,:));
             obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
-            obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(3,:));
+            obj.wheel(2,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(2,:));
+            obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(10,:)), norm(obj.upright(11,:)), norm(obj.upright(12,:)), obj.wheel(3,:));
             obj.wheel(2,:) = (obj.wheel(1,:)+obj.wheel(3,:))/2;
             obj = obj.evaluate();
         end
@@ -276,7 +285,8 @@ classdef Corner                                                            % Cla
             obj.inboard(5,2) = obj.inboard(5,2)+steer;
             obj.outboard(5,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.inboard(5,:), norm(obj.upright(2,:)), norm(obj.upright(3,:)), norm(obj.links(5,:)), obj.outboard(5,:));     % Finds tie rod outboard point
             obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
-            obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(3,:));
+            obj.wheel(2,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(2,:));
+            obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(10,:)), norm(obj.upright(11,:)), norm(obj.upright(12,:)), obj.wheel(3,:));
             obj = obj.evaluate();
         end
 
@@ -365,6 +375,9 @@ classdef Corner                                                            % Cla
 
         end
         function obj = ground(obj,p)
+            if nargin == 0
+                p = obj.contactPt;
+            end
             obj.outboard = obj.outboard - p.*[0,0,1];
             obj.inboard(1:6,:) = obj.inboard(1:6,:) - p.*[0,0,1];
             if ~isequal(obj.inboard(7:9,:),zeros(3))
@@ -414,21 +427,28 @@ classdef Corner                                                            % Cla
                     i = 3;
                     j = 1;
                 end
-                delta = 2^-6*(obj.params(2) - staticCamber)/abs(obj.params(2) - staticCamber);
-                obj.outboard(6,:) = obj.solveSpheres(obj.inboard(i,:), obj.inboard(i+1,:), obj.inboard(6,:), norm(obj.apex(1,:)), norm(obj.apex(2,:)), norm(obj.links(6,:))-delta, obj.outboard(6,:));
+                delta = 2^-7*(obj.params(2) - staticCamber)/abs(obj.params(2) - staticCamber);
+                obj.outboard(6,:) = obj.solveSpheres(obj.inboard(i,:), obj.inboard(i+1,:), obj.inboard(6,:), norm(obj.apex(1,:)), norm(obj.apex(2,1:3)), norm(obj.links(6,1:3))-delta, obj.outboard(6,:));
                 obj.outboard(i,:) = obj.solveSpheres(obj.inboard(i,:), obj.inboard(i+1,:), obj.outboard(6,:), norm(obj.links(i,:)), norm(obj.links(i+1,:)), norm(obj.apex(3,1:3)), obj.outboard(i,:));
                 obj.outboard(i+1,:) = obj.outboard(i,:);
                 obj.outboard(j,:) = obj.solveSpheres(obj.inboard(j,:), obj.inboard(j+1,:), obj.outboard(i,:), norm(obj.links(j,:)), norm(obj.links(j+1,:)), norm(obj.upright(1,:)), obj.outboard(j,:));
                 obj.outboard(j+1,:) = obj.outboard(j,:);
                 obj.outboard(5,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.inboard(5,:), norm(obj.upright(2,:)), norm(obj.upright(3,:)), norm(obj.links(5,:)), obj.outboard(5,:));
                 obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
-                obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(3,:));
-                obj.wheel(2,:) = (obj.wheel(1,:)+obj.wheel(3,:))/2;
+                obj.wheel(2,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(2,:));
+                obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(10,:)), norm(obj.upright(11,:)), norm(obj.upright(12,:)), obj.wheel(3,:));
+                obj = obj.evaluate();
+                
+            end
+            while abs(obj.params(1) - staticToe) > 2^-8
+                delta = 2^-7*(obj.params(1) - staticToe)/abs(obj.params(1) - staticToe);
+                obj.params(1)
+                obj.outboard(5,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.inboard(5,:), norm(obj.upright(2,:)), norm(obj.upright(3,:)), norm(obj.links(5,:))-delta, obj.outboard(5,:));     % Finds tie rod outboard point
+                obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
+                obj.wheel(2,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(2,:));
+                obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(10,:)), norm(obj.upright(11,:)), norm(obj.upright(12,:)), obj.wheel(3,:));
                 obj = obj.evaluate();
             end
-            % while abs(obj.params(1) - staticToe) > 2^-3
-            % 
-            % end
         end
     end
 end
