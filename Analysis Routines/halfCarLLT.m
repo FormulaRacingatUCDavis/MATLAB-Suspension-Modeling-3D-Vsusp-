@@ -27,7 +27,7 @@ function [Frames, Ay, roll] = halfCarLLT(carParams,Ay,steer,ForR)
     Frames = Frames.align(staticToe,staticCamber);
     Frames(2:n) = Frames(1);
     for i = 2:n  
-        dFz = 0.5*Ay(i)*carParams.m*9.8*carParams.hCG/TW;
+        dFz = p*Ay(i)*carParams.m*9.8*carParams.hCG/TW;
         if abs(dFz) > Fz0/2
             dFz = Fz0/2;
             Ay(i) = 0.5*Fz0/(carParams.m*9.8*carParams.hCG)*TW;

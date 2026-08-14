@@ -426,9 +426,9 @@ classdef Corner                                                            % Cla
                 obj.wheel(2,:) = (obj.wheel(1,:)+obj.wheel(3,:))/2;
                 obj = obj.evaluate();
             end
-            while abs(obj.params(1) - staticToe) > 2^-3
-
-            end
+            % while abs(obj.params(1) - staticToe) > 2^-3
+            % 
+            % end
         end
     end
 end
