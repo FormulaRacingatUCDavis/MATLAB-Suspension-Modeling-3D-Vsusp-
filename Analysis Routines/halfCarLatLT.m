@@ -2,8 +2,7 @@ function [Frames, Ay, roll] = halfCarLatLT(carParams,Ay,steer,ForR)
     switch ForR
         case 'F'                                                           % Car params stores both F and R hardpoints, so this indicates which we are modeling
             Frames = Half(carParams.outboardF,carParams.inboardF, ...
-                carParams.wheelF,carParams.springF,carParams.preloadF); 
-            TW = carParams.TWf;
+                carParams.wheelF,carParams.springF,carParams.preloadF);
             p = carParams.pFront;
         case 'R'
             Frames = Half(carParams.outboardR,carParams.inboardR, ...
@@ -23,11 +22,11 @@ function [Frames, Ay, roll] = halfCarLatLT(carParams,Ay,steer,ForR)
     staticCamber = Frames.L.params(2);
     for i = 1:3
         Frames = Frames.solveStatic(Fz0);
+        Frames = Frames.align(staticToe,staticCamber);
     end
-    Frames = Frames.align(staticToe,staticCamber);
     Frames(2:n) = Frames(1);
     for i = 2:n  
-        dFz = p*Ay(i)*carParams.m*9.8*carParams.hCG/TW;
+        dFz = p*Ay(i)*carParams.m*9.8*carParams.hCG/(Frames(n-1).L.contactPt(2)-Frames(n-1).R.contactPt(2))*1000;
         if abs(dFz) > Fz0/2
             dFz = Fz0/2;
             Ay(i) = 0.5*Fz0/(carParams.m*9.8*carParams.hCG)*TW;

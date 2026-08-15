@@ -25,13 +25,13 @@ classdef Half
         function obj = findKRC(obj)
             A = zeros(2,4,2);
 
-            v1 = obj.R.wheel(2,:) - obj.L.wheel(2,:);
-            v2 = obj.L.wheel(2,:).*[0,0,-1];
+            v1 = (obj.R.wheel(1,:)+obj.R.wheel(3,:))/2 - (obj.L.wheel(1,:)+obj.L.wheel(3,:))/2;
+            v2 = (obj.L.wheel(1,:)+obj.L.wheel(3,:))/2.*[0,0,-1];
 
             A(1,1:3,1) = cross(v1,v2)/norm(cross(v1,v2));
             A(1,1:3,2) = A(1,1:3,1);
-            A(1,4,1) = dot(A(1,1:3,1),obj.L.wheel(2,:));
-            A(1,4,2) = dot(A(1,1:3,2),obj.R.wheel(2,:));
+            A(1,4,1) = dot(A(1,1:3,1),(obj.L.wheel(1,:)+obj.L.wheel(3,:))/2);
+            A(1,4,2) = dot(A(1,1:3,2),(obj.R.wheel(1,:)+obj.R.wheel(3,:))/2);
             
             obj.L = obj.L.findIC(A);
             
@@ -58,7 +58,7 @@ classdef Half
             plot3([obj.L.inboard(2,1), obj.R.inboard(2,1)], [obj.L.inboard(2,2), obj.R.inboard(2,2)], [obj.L.inboard(2,3), obj.R.inboard(2,3)], 'Color', 'k', 'LineWidth', 4)
             plot3([obj.L.inboard(3,1), obj.R.inboard(3,1)], [obj.L.inboard(3,2), obj.R.inboard(3,2)], [obj.L.inboard(3,3), obj.R.inboard(3,3)], 'Color', 'k', 'LineWidth', 4)
             plot3([obj.L.inboard(4,1), obj.R.inboard(4,1)], [obj.L.inboard(4,2), obj.R.inboard(4,2)], [obj.L.inboard(4,3), obj.R.inboard(4,3)], 'Color', 'k', 'LineWidth', 4)
-            ylim([-1000,1000]);
+            ylim([-1600,1600]);
 
         end
         function krcPlot(obj)

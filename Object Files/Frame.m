@@ -16,7 +16,7 @@ classdef Frame
             obj.m = carParams.m;
             obj.pFront = carParams.pFront;
             obj.hCG = carParams.hCG;
-            obj.WB = carParams.WB;
+            obj.WB = obj.F.L.contactPt(1)-obj.R.L.contactPt(1)/10000;
             obj = obj.align();
         end
         function framePlot(obj)

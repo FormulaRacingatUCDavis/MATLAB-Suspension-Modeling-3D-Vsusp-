@@ -277,7 +277,6 @@ classdef Corner                                                            % Cla
             obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
             obj.wheel(2,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(2,:));
             obj.wheel(3,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(10,:)), norm(obj.upright(11,:)), norm(obj.upright(12,:)), obj.wheel(3,:));
-            obj.wheel(2,:) = (obj.wheel(1,:)+obj.wheel(3,:))/2;
             obj = obj.evaluate();
         end
 

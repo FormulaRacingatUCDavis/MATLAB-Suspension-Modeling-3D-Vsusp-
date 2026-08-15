@@ -16,7 +16,7 @@ function [Frames, steer] = SteerSweep(carParams, ForR)
     % Our linspace will be lock to look on the steering rack given in
     % travel from neutral
 
-    steer = linspace(-25,25,n);
+    steer = linspace(-1.24*25.4,1.24*25.4,n);
 
     % Everything from here
     idx = find(abs(steer) == min(abs(steer)));
@@ -103,7 +103,7 @@ function [Frames, steer] = SteerSweep(carParams, ForR)
     plot(steer(idx),Frames(idx).params(2),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Rack Travel (mm, from neutral)')
     ylabel('FL Camber (degrees)')
-    title('FE13 FL Camber vs. FL steer')
+    title('Prelim. FE14 FL Camber vs. FL steer')
 
     subplot(2,3,3)
     hold on
@@ -111,7 +111,7 @@ function [Frames, steer] = SteerSweep(carParams, ForR)
     plot(steer(idx),Frames(idx).params(1),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Rack Travel (mm, from neutral)')
     ylabel('FL Toe (degrees)')
-    title('FE13 FL Toe vs. FL steer')
+    title('Prelim. FE14 FL Toe vs. FL steer')
 
     subplot(2,3,4)
     hold on
@@ -119,7 +119,7 @@ function [Frames, steer] = SteerSweep(carParams, ForR)
     plot(steer(idx),Frames(idx).params(3),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Rack Travel (mm, from neutral)')
     ylabel('FL Caster (degrees)')
-    title('FE13 FL Caster vs. FL steer')
+    title('Prelim. FE14 FL Caster vs. FL steer')
 
     subplot(2,3,5)
     hold on
@@ -127,7 +127,7 @@ function [Frames, steer] = SteerSweep(carParams, ForR)
     plot(steer(idx),Frames(idx).params(4),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Rack Travel (mm, from neutral)')
     ylabel('FL Mechanical Trail (mm)')
-    title('FE13 FL Mechanical Trail vs. FL steer')
+    title('Prelim. FE14 FL Mechanical Trail vs. FL steer')
 
     subplot(2,3,6)
     hold on
@@ -135,7 +135,7 @@ function [Frames, steer] = SteerSweep(carParams, ForR)
     plot(steer(idx),Frames(idx).params(5),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Rack Travel (mm, from neutral)')
     ylabel('FL Scrub Radius (mm)')
-    title('FE13 FL Scrub Radius vs. FL steer')
+    title('Prelim. FE14 FL Scrub Radius vs. FL steer')
 
     drawnow
 end

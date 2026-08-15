@@ -105,16 +105,16 @@ function [Frames,bump] = BumpSweep(carParams, ForR)
     plot(bump(:),wheelParams(2,:))
     plot(bump(idx),Frames(idx).params(2),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Vertical Wheel Center Travel (mm, from static)')
-    ylabel('FL Camber (degrees)')
-    title('FE13 FL Camber vs. FL Bump')
+    ylabel('RL Camber (degrees)')
+    title('Prelim. FE14 RL Camber vs. RL Bump')
 
     subplot(2,3,3)
     hold on
     plot(bump(:),wheelParams(1,:))
     plot(bump(idx),Frames(idx).params(1),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Vertical Wheel Center Travel (mm, from static)')
-    ylabel('FL Toe (degrees)')
-    title('FE13 FL Toe vs. FL Bump')
+    ylabel('RL Toe (degrees)')
+    title('Prelim. FE14 RL Toe vs. RL Bump')
 
     subplot(2,3,4)
     hold on
@@ -122,7 +122,7 @@ function [Frames,bump] = BumpSweep(carParams, ForR)
     plot(bump(idx),Frames(idx).params(3),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Vertical Wheel Center Travel (mm, from static)')
     ylabel('FL Caster (degrees)')
-    title('FE13 FL Caster vs. FL Bump')
+    title('Prelim. FE14 FL Caster vs. FL Bump')
 
     subplot(2,3,5)
     hold on
@@ -130,7 +130,7 @@ function [Frames,bump] = BumpSweep(carParams, ForR)
     plot(bump(idx),Frames(idx).params(4),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Vertical Wheel Center Travel (mm, from static)')
     ylabel('FL Mechanical Trail (mm)')
-    title('FE13 FL Mechanical Trail vs. FL Bump')
+    title('Prelim. FE14 FL Mechanical Trail vs. FL Bump')
 
     subplot(2,3,6)
     hold on
@@ -138,7 +138,7 @@ function [Frames,bump] = BumpSweep(carParams, ForR)
     plot(bump(idx),Frames(idx).params(5),'-o','MarkerSize',5,'LineWidth',5)
     xlabel('Vertical Wheel Center Travel (mm, from static)')
     ylabel('FL Scrub Radius (mm)')
-    title('FE13 FL Scrub Radius vs. FL Bump')
+    title('Prelim. FE14 FL Scrub Radius vs. FL Bump')
 
     drawnow
 end
