@@ -1,4 +1,4 @@
-function [Frames, Ay, roll] = halfCarLLT(carParams,Ay,steer,ForR)
+function [Frames, Ay, roll] = halfCarLatLT(carParams,Ay,steer,ForR)
     switch ForR
         case 'F'                                                           % Car params stores both F and R hardpoints, so this indicates which we are modeling
             Frames = Half(carParams.outboardF,carParams.inboardF, ...
@@ -12,9 +12,9 @@ function [Frames, Ay, roll] = halfCarLLT(carParams,Ay,steer,ForR)
             p = 1 - carParams.pFront;
         otherwise
             error('Please enter F or R for front or rear')
-    end   
-    roll = 0;
+    end
     n = abs(Ay)*10+1;
+    roll = zeros(1,n);
     Fz0 = carParams.m*9.8*p;
     Ay = linspace(0,Ay,n);
     steer = linspace(0,steer,n);
@@ -35,5 +35,6 @@ function [Frames, Ay, roll] = halfCarLLT(carParams,Ay,steer,ForR)
         Frames(i) = Frames(i-1).solveLLT(Fz0,dFz,Ay(i));
         Frames(i) = Frames(i).solveSteer(steer(i)-steer(i-1));
         Frames(i) = Frames(i).level();
+        roll(i) = Frames(i).roll;
     end
 end

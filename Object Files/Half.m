@@ -3,11 +3,14 @@ classdef Half
         L = Corner()
         R = Corner()
         Spring = Spring()
-        krc = 0
+        krc = zeros(1,3)
         roll = 0
     end
     methods
         function obj = Half(outboard,inboard,wheel,spring,preload)
+            if nargin == 0
+                return
+            end
             obj.L = Corner(outboard,inboard,wheel,spring,preload);
             obj.R = Corner(outboard.*[1,-1,1], inboard.*[1,-1,1], wheel.*[1,-1,1],spring,preload);
             % obj.L = obj.L.findTire(8*25.4,5*25.4);
@@ -93,7 +96,7 @@ classdef Half
             while norm(obj.L.contactPt(3) - obj.R.contactPt(3)) > 2^-32
                 theta = -atand((obj.L.contactPt(3) - obj.R.contactPt(3))/...
                     norm(obj.L.contactPt(1:2) - obj.R.contactPt(1:2)));
-                obj = obj.rollHalf(obj.krc.*[0,1,1],theta,"ZYX");
+                obj = obj.rollHalf(obj.krc-[1,0,0],theta,"ZYX");
                 obj.roll = obj.roll+theta;
             end
             obj = obj.ground(obj.L.contactPt);
@@ -106,6 +109,17 @@ classdef Half
             obj.L = obj.L.align(staticToe,staticCamber);
             obj.R = obj.R.align(staticToe,staticCamber);
             obj = obj.ground(obj.L.contactPt);
+        end
+        function obj = solve(obj,FxL,FyL,FzL,FxR,FyR,FzR)
+            obj.L = obj.L.solveForce(FxL, FyL, FzL);
+            if nargin == 7
+                obj.R = obj.R.solveForce(FxR, FyR, FzR);
+            else
+                obj.R = obj.R.solveForce(FxL, FyL, FzL);
+            end
+            obj.L = obj.L.solveBump();
+            obj.R = obj.R.solveBump();
+            obj = obj.evaluate();
         end
     end
 end

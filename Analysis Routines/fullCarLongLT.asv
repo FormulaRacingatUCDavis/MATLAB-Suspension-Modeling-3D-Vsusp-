@@ -1,0 +1,14 @@
+function [Frames,Ax,pitch] = fullCarLongLT(carParams,Ax)
+    n = abs(Ax)*10+1;
+    pitch = zeros(1,n);
+    Ax = linspace(0,Ax,n);
+    Frames(1:n) = Frame(carParams);
+    for i = 2:n
+        for j = 1:1
+            dFz = carParams.m*Ax(i)*9.8*carParams.hCG/carParams.WB;
+            Frames(i) = Frames(i-1).solveLongLT(dFz,Ax(i));
+            Frames(i) = Frames(i).level();
+            pitch(i) = Frames(i).pitch;
+        end
+    end
+end
