@@ -1,0 +1,141 @@
+function [Frames, steer] = SteerSweep(carParams, ForR)
+    clf
+    n = 51;                                                                
+    
+    switch ForR
+        case 'F'                                                           % Car params stores both F and R hardpoints, so this indicates which we are modeling
+            Frames(1) = Corner(carParams.outboardF,carParams.inboardF, ...
+                carParams.wheelF,carParams.springF,carParams.preloadF); 
+        case 'R'
+            Frames(1) = Corner(carParams.outboardR,carParams.inboardR, ...
+                carParams.wheelR,carParams.springR,carParams.preloadR); 
+        otherwise
+            error('Please enter F or R for front or rear')
+    end
+    
+    % Our linspace will be lock to look on the steering rack given in
+    % travel from neutral
+
+    steer = linspace(-25,25,n);
+
+    % Everything from here
+    idx = find(abs(steer) == min(abs(steer)));
+
+    Frames(1) = Frames(1).solveSteer(steer(idx));
+    Frames(1) = Frames(1).ground(Frames(1).contactPt);  
+    Frames(2:n) = Frames(1);
+    
+    steer = steer - steer(idx);
+    % To here does not have to be included in SteerSweep
+    % idx will be our middle index ceil(n/2)
+    
+    Frames(idx) = Frames(idx).findTire();
+    
+    wheelParams = zeros(5,n);
+    wheelParams(:,idx) = Frames(idx).params;
+                                                                           % The program assumes small travel between frames, so we start from static and work
+    for i = idx-1:-1:1                                                     % our way toward each extreme from the middle outwards
+        Frames(i) = Frames(i+1).solveSteer(steer(i)-steer(i+1));
+        Frames(i) = Frames(i).findTire();
+        wheelParams(:,i) = Frames(i).params;
+    end
+    for i = idx+1:n
+        Frames(i) = Frames(i-1).solveSteer(steer(i)-steer(i-1));
+        Frames(i) = Frames(i).findTire();
+        wheelParams(:,i) = Frames(i).params;
+    end
+    
+    for i = 1:n                                                            % Code for live animation
+        subplot(2,3,1)
+        Frames(i).cornerPlot()
+        
+        subplot(2,3,2)
+        hold on
+        plot(steer(:),wheelParams(2,:))
+        plot(steer(i),Frames(i).params(2),'-o','MarkerSize',5,'LineWidth',5)
+        xlabel('Rack Travel (mm, from neutral)')
+        ylabel('FL Camber (degrees)')
+        title('FL Camber vs. FL steer')
+
+        subplot(2,3,3)
+        hold on
+        plot(steer(:),wheelParams(1,:))
+        plot(steer(i),Frames(i).params(1),'-o','MarkerSize',5,'LineWidth',5)
+        xlabel('Rack Travel (mm, from neutral)')
+        ylabel('FL Toe (degrees)')
+        title('FL Toe vs. FL steer')
+
+        subplot(2,3,4)
+        hold on
+        plot(steer(:),wheelParams(3,:))
+        plot(steer(i),Frames(i).params(3),'-o','MarkerSize',5,'LineWidth',5)
+        xlabel('Rack Travel (mm, from neutral)')
+        ylabel('FL Caster (degrees)')
+        title('FL Caster vs. FL steer')
+
+        subplot(2,3,5)
+        hold on
+        plot(steer(:),wheelParams(4,:))
+        plot(steer(i),Frames(i).params(4),'-o','MarkerSize',5,'LineWidth',5)
+        xlabel('Rack Travel (mm, from neutral)')
+        ylabel('FL Mechanical Trail (mm)')
+        title('FL Mechanical Trail vs. FL steer')
+
+        subplot(2,3,6)
+        hold on
+        plot(steer(:),wheelParams(5,:))
+        plot(steer(i),Frames(i).params(5),'-o','MarkerSize',5,'LineWidth',5)
+        xlabel('Rack Travel (mm, from neutral)')
+        ylabel('FL Scrub Radius (mm)')
+        title('FL Scrub Radius vs. FL steer')
+        
+        drawnow
+
+        clf
+    end
+
+    subplot(2,3,1)
+    Frames(idx).cornerPlot()
+
+    subplot(2,3,2)
+    hold on
+    plot(steer(:),wheelParams(2,:))
+    plot(steer(idx),Frames(idx).params(2),'-o','MarkerSize',5,'LineWidth',5)
+    xlabel('Rack Travel (mm, from neutral)')
+    ylabel('FL Camber (degrees)')
+    title('FE13 FL Camber vs. FL steer')
+
+    subplot(2,3,3)
+    hold on
+    plot(steer(:),wheelParams(1,:))
+    plot(steer(idx),Frames(idx).params(1),'-o','MarkerSize',5,'LineWidth',5)
+    xlabel('Rack Travel (mm, from neutral)')
+    ylabel('FL Toe (degrees)')
+    title('FE13 FL Toe vs. FL steer')
+
+    subplot(2,3,4)
+    hold on
+    plot(steer(:),wheelParams(3,:))
+    plot(steer(idx),Frames(idx).params(3),'-o','MarkerSize',5,'LineWidth',5)
+    xlabel('Rack Travel (mm, from neutral)')
+    ylabel('FL Caster (degrees)')
+    title('FE13 FL Caster vs. FL steer')
+
+    subplot(2,3,5)
+    hold on
+    plot(steer(:),wheelParams(4,:))
+    plot(steer(idx),Frames(idx).params(4),'-o','MarkerSize',5,'LineWidth',5)
+    xlabel('Rack Travel (mm, from neutral)')
+    ylabel('FL Mechanical Trail (mm)')
+    title('FE13 FL Mechanical Trail vs. FL steer')
+
+    subplot(2,3,6)
+    hold on
+    plot(steer(:),wheelParams(5,:))
+    plot(steer(idx),Frames(idx).params(5),'-o','MarkerSize',5,'LineWidth',5)
+    xlabel('Rack Travel (mm, from neutral)')
+    ylabel('FL Scrub Radius (mm)')
+    title('FE13 FL Scrub Radius vs. FL steer')
+
+    drawnow
+end

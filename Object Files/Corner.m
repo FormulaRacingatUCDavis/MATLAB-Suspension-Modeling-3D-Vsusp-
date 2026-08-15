@@ -375,7 +375,7 @@ classdef Corner                                                            % Cla
 
         end
         function obj = ground(obj,p)
-            if nargin == 0
+            if nargin == 1
                 p = obj.contactPt;
             end
             obj.outboard = obj.outboard - p.*[0,0,1];
@@ -442,7 +442,6 @@ classdef Corner                                                            % Cla
             end
             while abs(obj.params(1) - staticToe) > 2^-8
                 delta = 2^-7*(obj.params(1) - staticToe)/abs(obj.params(1) - staticToe);
-                obj.params(1)
                 obj.outboard(5,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.inboard(5,:), norm(obj.upright(2,:)), norm(obj.upright(3,:)), norm(obj.links(5,:))-delta, obj.outboard(5,:));     % Finds tie rod outboard point
                 obj.wheel(1,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(4,:)), norm(obj.upright(5,:)), norm(obj.upright(6,:)), obj.wheel(1,:));
                 obj.wheel(2,:) = obj.solveSpheres(obj.outboard(1,:), obj.outboard(3,:), obj.outboard(5,:), norm(obj.upright(7,:)), norm(obj.upright(8,:)), norm(obj.upright(9,:)), obj.wheel(2,:));
